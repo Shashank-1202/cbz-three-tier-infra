@@ -1,6 +1,6 @@
 # Create an IAM Role for the EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {
-  name = "eks-cluster-role-1"
+  name = "eks-cluster-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -14,6 +14,10 @@ resource "aws_iam_role" "eks_cluster_role" {
       }
     ]
   })
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 # Attach necessary policies to the EKS Cluster IAM Role
@@ -29,7 +33,7 @@ resource "aws_iam_role_policy_attachment" "eks_service_policy" {
 
 # Create an IAM Role for the Node Group
 resource "aws_iam_role" "eks_node_role" {
-  name = "eks-node-role-1"
+  name = "eks-node-role-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -43,6 +47,10 @@ resource "aws_iam_role" "eks_node_role" {
       }
     ]
   })
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 # Attach necessary policies to the Node Group IAM Role
@@ -75,7 +83,7 @@ data "aws_subnets" "default" {
 
 # Create an EKS Cluster
 resource "aws_eks_cluster" "cbz_cluster" {
-  name     = "${var.project}-cluster"
+  name     = "${var.project}-cluster-${var.environment}"
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
@@ -86,12 +94,16 @@ resource "aws_eks_cluster" "cbz_cluster" {
     aws_iam_role_policy_attachment.eks_cluster_policy,
     aws_iam_role_policy_attachment.eks_service_policy
   ]
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 # Create a Node Group
 resource "aws_eks_node_group" "cbz_nodegroup" {
   cluster_name    = aws_eks_cluster.cbz_cluster.name
-  node_group_name = "${var.project}-node-group"
+  node_group_name = "${var.project}-node-group-${var.environment}"
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = data.aws_subnets.default.ids
 
@@ -108,4 +120,8 @@ resource "aws_eks_node_group" "cbz_nodegroup" {
     aws_iam_role_policy_attachment.eks_cni_policy,
     aws_iam_role_policy_attachment.ec2_container_policy
   ]
+
+  tags = {
+    Environment = var.environment
+  }
 }

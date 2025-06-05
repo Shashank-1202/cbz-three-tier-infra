@@ -1,6 +1,6 @@
 # Create an S3 bucket
 resource "aws_s3_bucket" "cbz_bucket" {
-  bucket = "cbz-frontend-project-bux" # Replace with a globally unique bucket name
+  bucket = var.bucket_name
 
   # Enable static website hosting
   website {
@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "cbz_bucket" {
 
   tags = {
     Name        = "StaticWebsiteBucket"
-    env = "dev"
+    Environment = var.environment
   }
 }
 
@@ -23,6 +23,7 @@ resource "aws_s3_bucket_public_access_block" "example" {
   ignore_public_acls      = false
   restrict_public_buckets = false
 }
+
 # Set the bucket policy to allow public read access (use cautiously)
 resource "aws_s3_bucket_policy" "static_website_policy" {
   bucket = aws_s3_bucket.cbz_bucket.id
