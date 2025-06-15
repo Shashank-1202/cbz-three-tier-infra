@@ -1,5 +1,5 @@
 environment = "dev"
-aws_region = "us-east-1"
+aws_region = "eu-west-2"
 
 # RDS Variables
 rds_instance_class        = "db.t3.micro"
