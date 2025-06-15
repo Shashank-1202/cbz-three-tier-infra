@@ -2,6 +2,8 @@
 resource "aws_s3_bucket" "cbz_bucket" {
   bucket = var.bucket_name
 
+  force_destroy = true
+
   # Enable static website hosting
   website {
     index_document = "index.html"
